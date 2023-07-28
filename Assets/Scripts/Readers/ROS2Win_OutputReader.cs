@@ -29,6 +29,9 @@ namespace SimsoftVR.Readers
         private ISubscription<pose_msg> pose_sub_JointsCurrentPoses;
         private ISubscription<pose_msg> pose_sub_LinkNodesCurrentPoses;
 
+        private float timer = 0;
+        private float maxWaitTime = 10.0f;
+
         private void Awake()
         {
             if (instance == null)
@@ -67,15 +70,23 @@ namespace SimsoftVR.Readers
 
             string_sub = ros2Node.CreateSubscription<string_msg>(controlTypeRosAddress, GetControlType);
 
-            // NON CANCELLARE!!!
-            //while (ControlType == null)
-            //{
-            //    yield return null;
-            //    Debug.Log("Waiting for control type");
-            //}
+            while (ControlType == null)
+            {
+                yield return null;
+                timer += Time.fixedDeltaTime;
+                Debug.Log("Waiting for control type ");
 
-            //InvokeOnControlTypeLoaded();
+                if (timer > maxWaitTime)
+                {
+                    Debug.Log("Control Type not found. Going ahead...");
+                    timer = 0;
+                    goto JointSetup;
+                }
+            }
 
+            InvokeOnControlTypeLoaded();
+
+            JointSetup:
             ActiveJointId = -1;
             int_sub = ros2Node.CreateSubscription<int_msg>(activeJointAddress, GetActiveJoint);
             float_sub = ros2Node.CreateSubscription<float_msg>(amplitudeAddress, GetAmplitude);
