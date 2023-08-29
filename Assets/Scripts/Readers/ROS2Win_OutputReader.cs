@@ -70,19 +70,11 @@ namespace SimsoftVR.Readers
 
             string_sub = ros2Node.CreateSubscription<string_msg>(controlTypeRosAddress, GetControlType);
 
-            while (ControlType == null)
-            {
-                yield return null;
-                timer += Time.fixedDeltaTime;
-                Debug.Log("Waiting for control type ");
-
-                if (timer > maxWaitTime)
-                {
-                    Debug.Log("Control Type not found. Going ahead...");
-                    timer = 0;
-                    goto JointSetup;
-                }
-            }
+            //while (ControlType == null)
+            //{
+            //    yield return null;
+            //    Debug.Log("Waiting for control type ");
+            //}
 
             InvokeOnControlTypeLoaded();
 
